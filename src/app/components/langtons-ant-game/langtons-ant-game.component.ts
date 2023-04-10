@@ -2,7 +2,8 @@ import {
   Component, 
   ViewChild, 
   ElementRef, 
-  AfterViewInit 
+  AfterViewInit,
+  NgZone
 } from '@angular/core';
 
 @Component({
@@ -17,13 +18,26 @@ export class LangtonsAntGameComponent implements AfterViewInit {
   context: CanvasRenderingContext2D = 
     {} as CanvasRenderingContext2D;
 
-  ngAfterViewInit() {
-    this.context = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-    requestAnimationFrame(updateGame);
-  }
-}
+  constructor(private ngZone: NgZone) {}
 
-function updateGame() {
-  requestAnimationFrame(updateGame);
-  console.log('frame');
+  ngAfterViewInit() {
+    this.context = this.canvas.nativeElement
+      .getContext('2d') as CanvasRenderingContext2D;
+    this.ngZone.runOutsideAngular(() => this.updateGame());
+  }
+
+  updateGame() {
+    console.log('frame');
+    this.drawGrid();
+    requestAnimationFrame(() => this.updateGame());
+  }
+  
+  drawGrid() {
+    this.context.fillStyle = '#FFFFFF';
+    this.context.fillRect(
+      0, 
+      0, 
+      this.canvas.nativeElement.width, 
+      this.canvas.nativeElement.height);
+  }
 }
