@@ -7,17 +7,29 @@
 ></canvas>
 
 <div class="settings">
-  <form class="settings-form">
+  <form class="settings-form" (ngSubmit)="onStartPressed()">
     <label>Grid Width</label>
-    <input type="number" name="grid_width" />
+    <input 
+      type="number" 
+      name="grid_width" 
+      [(ngModel)]="gridWidth"
+    />
     
     <label>Grid Height</label>
-    <input type="number" name="grid_height" />
+    <input 
+      type="number" 
+      name="grid_height" 
+      [(ngModel)]="gridHeight"
+    />
 
     <label>Pixel per Cell</label>
-    <input type="number" name="pixel_per_cell" />
+    <input 
+      type="number" 
+      name="pixel_per_cell" 
+      [(ngModel)]="pixelPerCell"
+    />
 
-    <button type="submit">Start</button>
+    <button type="submit" onsubmit="">Start</button>
   </form>
 
   <button>Toggle Pause</button>
