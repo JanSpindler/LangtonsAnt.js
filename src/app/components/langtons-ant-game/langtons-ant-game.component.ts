@@ -23,13 +23,13 @@ function modulo(n: number, m: number): number {
 
 function rotateDirCw(dir: Direction): Direction {
   const newDir: Direction = modulo(dir - 1, 4);
-  console.log('New direction: ' + newDir);
+  //console.log('New direction: ' + newDir);
   return newDir;
 }
 
 function rotateDirCcw(dir: Direction): Direction {
   const newDir: Direction = modulo(dir + 1, 4);
-  console.log('New direction: ' + newDir);
+  //console.log('New direction: ' + newDir);
   return newDir;
 }
 
@@ -173,8 +173,10 @@ export class LangtonsAntGameComponent implements AfterViewInit {
   stepGame(): void {
     //console.log('Step game');
 
+    // Scan current cell
     const cellVal: number = this.grid[this.antX][this.antY];
 
+    // Rotate and flip
     if (cellVal === 0) {
       this.antDir = rotateDirCw(this.antDir);
       this.grid[this.antX][this.antY] = 1;
@@ -185,6 +187,11 @@ export class LangtonsAntGameComponent implements AfterViewInit {
       console.log('Error: invalid cell value ' + cellVal);
     }
 
+    // Store old ant position
+    const oldAntX: number = this.antX;
+    const oldAntY: number = this.antY;
+
+    // Move
     switch (this.antDir) {
       case Direction.Up:
         this.antY--;
@@ -203,6 +210,19 @@ export class LangtonsAntGameComponent implements AfterViewInit {
         break;
     }
 
+    // Check if ant left the grid
+    if (
+      this.antX < 0 
+      || this.antY < 0 
+      || this.antX >= this.currentGridWidth 
+      || this.antY >= this.currentGridHeight
+      ) {
+        this.pauseAfterStep = true;
+        this.antX = oldAntX;
+        this.antY = oldAntY;
+    }
+
+    // Update gui
     this.incStepCounter();
   }
 
