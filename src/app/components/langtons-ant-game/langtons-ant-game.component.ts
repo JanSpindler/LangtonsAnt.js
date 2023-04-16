@@ -10,6 +10,29 @@ interface GridType {
   name: string
 }
 
+enum Direction {
+  Up = 0,
+  Left = 1,
+  Down = 2,
+  Right = 3,
+}
+
+function modulo(n: number, m: number): number {
+  return ((n % m) + m) % m;
+}
+
+function rotateDirCw(dir: Direction): Direction {
+  const newDir: Direction = modulo(dir - 1, 4);
+  console.log('New direction: ' + newDir);
+  return newDir;
+}
+
+function rotateDirCcw(dir: Direction): Direction {
+  const newDir: Direction = modulo(dir + 1, 4);
+  console.log('New direction: ' + newDir);
+  return newDir;
+}
+
 @Component({
   selector: 'app-langtons-ant-game',
   templateUrl: './langtons-ant-game.component.html',
@@ -45,8 +68,9 @@ export class LangtonsAntGameComponent implements AfterViewInit {
   currentWindowWidth: number = 0;
   currentWindowHeight: number = 0;
 
-  currentAntX: number = 0;
-  currentAntY: number = 0;
+  antX: number = 0;
+  antY: number = 0;
+  antDir: Direction = Direction.Up;
 
   grid: number[][] = new Array<Array<number>>();
 
@@ -74,9 +98,6 @@ export class LangtonsAntGameComponent implements AfterViewInit {
     this.currentWindowWidth = this.gridWidth * this.pixelPerCell;
     this.currentWindowHeight = this.gridHeight * this.pixelPerCell;
 
-    this.currentAntX = Math.floor(this.gridWidth / 2);
-    this.currentAntY = Math.floor(this.gridHeight / 2);
-
     this.canvas.nativeElement.width = this.currentWindowWidth;
     this.canvas.nativeElement.height = this.currentWindowHeight;
 
@@ -97,6 +118,10 @@ export class LangtonsAntGameComponent implements AfterViewInit {
 
   startGame(): void {
     console.log('Start game');
+
+    this.antX = Math.floor(this.currentGridWidth / 2);
+    this.antY = Math.floor(this.currentGridHeight / 2);
+    this.antDir = Direction.Up;
 
     this.stopGame();
     this.setStepCounter(0);
@@ -134,7 +159,7 @@ export class LangtonsAntGameComponent implements AfterViewInit {
 
     this.drawGrid();
     if (!this.pauseAfterStep) {
-      setTimeout(() => this.unpausedUpdateGame(), 1000);
+      setTimeout(() => this.unpausedUpdateGame(), 0);
       return;
     }
     requestAnimationFrame(() => this.updateGame());
@@ -146,7 +171,37 @@ export class LangtonsAntGameComponent implements AfterViewInit {
   }
 
   stepGame(): void {
-    console.log('Step game');
+    //console.log('Step game');
+
+    const cellVal: number = this.grid[this.antX][this.antY];
+
+    if (cellVal === 0) {
+      this.antDir = rotateDirCw(this.antDir);
+      this.grid[this.antX][this.antY] = 1;
+    } else if (cellVal === 1) {
+      this.antDir = rotateDirCcw(this.antDir);
+      this.grid[this.antX][this.antY] = 0;
+    } else {
+      console.log('Error: invalid cell value ' + cellVal);
+    }
+
+    switch (this.antDir) {
+      case Direction.Up:
+        this.antY--;
+        break;
+      case Direction.Left:
+        this.antX--;
+        break;
+      case Direction.Down:
+        this.antY++;
+        break;
+      case Direction.Right:
+        this.antX++;
+        break;
+      default:
+        console.log('Error: unknown ant direction' + this.antDir);
+        break;
+    }
 
     this.incStepCounter();
   }
@@ -173,7 +228,7 @@ export class LangtonsAntGameComponent implements AfterViewInit {
 
     for (let x = 0; x < this.currentGridWidth; x++) {
       for (let y = 0; y < this.currentGridHeight; y++) {
-        if (x === this.currentAntX && y === this.currentAntY) {
+        if (x === this.antX && y === this.antY) {
           this.context.fillStyle = '#FF0000';
         } else if (this.grid[x][y] === 0) {
           this.context.fillStyle = '#FFFFFF';
