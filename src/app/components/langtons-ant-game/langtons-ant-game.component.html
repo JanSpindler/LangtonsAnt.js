@@ -1,37 +1,45 @@
 <h1>Langton's Ant</h1>
 
-<canvas 
-  width="400" 
-  height="400" 
-  #canvas
-></canvas>
+<p>Game status: {{ gameStatus }}</p>
+<p>Pause after step: {{ pauseAfterStep }}</p>
+<p #stepCounterText>Step counter: {{ stepCounter }}</p>
+
+<canvas #canvas></canvas>
 
 <div class="settings">
   <form class="settings-form" (ngSubmit)="onStartPressed()">
     <label>Grid Width</label>
     <input 
       type="number" 
-      name="grid_width" 
+      name="gridWidth" 
       [(ngModel)]="gridWidth"
     />
     
     <label>Grid Height</label>
     <input 
       type="number" 
-      name="grid_height" 
+      name="gridHeight" 
       [(ngModel)]="gridHeight"
     />
 
     <label>Pixel per Cell</label>
     <input 
       type="number" 
-      name="pixel_per_cell" 
+      name="pixelPerCell" 
       [(ngModel)]="pixelPerCell"
     />
 
-    <button type="submit" onsubmit="">Start</button>
+    <select name="gridType" [(ngModel)]="gridType">
+      <option value="" disabled>Select a grid type</option>
+      <option *ngFor="let gridType of gridTypes" [ngValue]="gridType">
+        {{ gridType.name }}
+      </option>
+    </select>
+
+    <button type="submit">Start</button>
   </form>
 
-  <button>Toggle Pause</button>
-  <button>Reset</button>
+  <button (click)="onTogglePausePressed()">Toggle Pause</button>
+  <button (click)="onResetPressed()">Reset</button>
+  <button (click)="onStepPressed()">Step</button>
 </div>
